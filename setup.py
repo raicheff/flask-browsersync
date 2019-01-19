@@ -16,7 +16,7 @@ setup(
     author='Boris Raicheff',
     author_email='b@raicheff.com',
     url='https://github.com/raicheff/flask-browsersync',
-    py_modules=('flask_browsersync',),
+    py_modules=['flask_browsersync'],
 )
 
 

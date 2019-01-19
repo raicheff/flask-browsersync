@@ -6,11 +6,13 @@
 #
 
 
-import functools
 import logging
 import threading
 import time
 import urllib.request
+
+from flask import request
+from markupsafe import Markup
 
 
 logger = logging.getLogger('Flask-Browsersync')
@@ -48,17 +50,15 @@ class Browsersync(object):
             logger.debug('Flask-Browsersync not configured')
             return
         self.scheme, self.host, self.port = config
-        app.add_template_global(functools.partial(_render_browsersync, self.port), 'browsersync')
+        app.add_template_global(self._render_browsersync, 'browsersync')
         app.url_defaults(_timestamp_static_file)
         app.extensions['browsersync'] = self
 
     def reload(self):
         threading.Thread(target=_issue_request, args=(self.scheme, self.host, self.port)).start()
 
-
-def _render_browsersync(port):
-    from flask import request
-    return f'<script src="//{request.host}:{port}/browser-sync/browser-sync-client.js" async defer></script>'
+    def _render_browsersync(self):
+        return Markup(f'<script src="//{request.host}:{self.port}/browser-sync/browser-sync-client.js" async defer></script>')
 
 
 def _timestamp_static_file(endpoint, values):
